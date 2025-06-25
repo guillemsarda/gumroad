@@ -222,7 +222,7 @@ export const CardGrid = ({
       if (minPriceTimeoutId) window.clearTimeout(minPriceTimeoutId);
       if (maxPriceTimeoutId) window.clearTimeout(maxPriceTimeoutId);
     },
-    [minPriceTimeoutId, maxPriceTimeoutId],
+    [],
   );
 
   return (
@@ -323,9 +323,7 @@ export const CardGrid = ({
                       }
                       setMinPriceTimeoutId(
                         window.setTimeout(
-                          (minPrice: number | null, maxPrice: number | null) => {
-                            trySetPrice(minPrice, maxPrice);
-                          },
+                          (minPrice: number | null, maxPrice: number | null) => trySetPrice(minPrice, maxPrice),
                           500,
                           value,
                           enteredMaxPrice,
@@ -353,9 +351,7 @@ export const CardGrid = ({
                       }
                       setMaxPriceTimeoutId(
                         window.setTimeout(
-                          (minPrice: number | null, maxPrice: number | null) => {
-                            trySetPrice(minPrice, maxPrice);
-                          },
+                          (minPrice: number | null, maxPrice: number | null) => trySetPrice(minPrice, maxPrice),
                           500,
                           enteredMinPrice,
                           value,
