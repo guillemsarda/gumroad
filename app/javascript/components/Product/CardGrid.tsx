@@ -214,15 +214,24 @@ export const CardGrid = ({
   };
   const [tagsOpen, setTagsOpen] = React.useState(false);
   const [filetypesOpen, setFiletypesOpen] = React.useState(false);
-  const [debounceTimeoutId, setDebounceTimeoutId] = React.useState<NodeJS.Timeout | null>(null);
+  const [debounceTimeoutId, setDebounceTimeoutId] = React.useState<number | null>(null);
 
   const debounceCall = (refreshPage: () => void, timeout: number) => {
     if (debounceTimeoutId) {
       clearTimeout(debounceTimeoutId);
       setDebounceTimeoutId(null);
     }
-    setDebounceTimeoutId(setTimeout(() => refreshPage(), timeout));
+    setDebounceTimeoutId(window.setTimeout(() => refreshPage(), timeout));
   };
+
+  React.useEffect(
+    () => () => {
+      if (debounceTimeoutId) {
+        clearTimeout(debounceTimeoutId);
+      }
+    },
+    [debounceTimeoutId],
+  );
 
   return (
     <div className="with-sidebar">
