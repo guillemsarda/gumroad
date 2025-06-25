@@ -214,23 +214,15 @@ export const CardGrid = ({
   };
   const [tagsOpen, setTagsOpen] = React.useState(false);
   const [filetypesOpen, setFiletypesOpen] = React.useState(false);
-  const [debounceTimeoutId, setDebounceTimeoutId] = React.useState<number | null>(null);
-
-  const debounceCall = (refreshPage: () => void, timeout: number) => {
-    if (debounceTimeoutId) {
-      clearTimeout(debounceTimeoutId);
-      setDebounceTimeoutId(null);
-    }
-    setDebounceTimeoutId(window.setTimeout(() => refreshPage(), timeout));
-  };
+  const [minPriceTimeoutId, setMinPriceTimeoutId] = React.useState<number | null>(null);
+  const [maxPriceTimeoutId, setMaxPriceTimeoutId] = React.useState<number | null>(null);
 
   React.useEffect(
     () => () => {
-      if (debounceTimeoutId) {
-        clearTimeout(debounceTimeoutId);
-      }
+      if (minPriceTimeoutId) window.clearTimeout(minPriceTimeoutId);
+      if (maxPriceTimeoutId) window.clearTimeout(maxPriceTimeoutId);
     },
-    [debounceTimeoutId],
+    [minPriceTimeoutId, maxPriceTimeoutId],
   );
 
   return (
@@ -325,7 +317,20 @@ export const CardGrid = ({
                   <NumberInput
                     onChange={(value) => {
                       setEnteredMinPrice(value);
-                      debounceCall(() => trySetPrice(value, enteredMaxPrice), 500);
+                      if (minPriceTimeoutId) {
+                        clearTimeout(minPriceTimeoutId);
+                        setMinPriceTimeoutId(null);
+                      }
+                      setMaxPriceTimeoutId(
+                        window.setTimeout(
+                          (minPrice: number | null, maxPrice: number | null) => {
+                            trySetPrice(minPrice, maxPrice);
+                          },
+                          500,
+                          value,
+                          enteredMaxPrice,
+                        ),
+                      );
                     }}
                     value={enteredMinPrice ?? null}
                   >
@@ -342,7 +347,20 @@ export const CardGrid = ({
                   <NumberInput
                     onChange={(value) => {
                       setEnteredMaxPrice(value);
-                      debounceCall(() => trySetPrice(enteredMinPrice, value), 500);
+                      if (maxPriceTimeoutId) {
+                        clearTimeout(maxPriceTimeoutId);
+                        setMaxPriceTimeoutId(null);
+                      }
+                      setMinPriceTimeoutId(
+                        window.setTimeout(
+                          (minPrice: number | null, maxPrice: number | null) => {
+                            trySetPrice(minPrice, maxPrice);
+                          },
+                          500,
+                          enteredMinPrice,
+                          value,
+                        ),
+                      );
                     }}
                     value={enteredMaxPrice ?? null}
                   >
