@@ -214,6 +214,15 @@ export const CardGrid = ({
   };
   const [tagsOpen, setTagsOpen] = React.useState(false);
   const [filetypesOpen, setFiletypesOpen] = React.useState(false);
+  const [debounceTimeoutId, setDebounceTimeoutId] = React.useState<NodeJS.Timeout | null>(null);
+
+  const debounceCall = (refreshPage: () => void, timeout: number) => {
+    if (debounceTimeoutId) {
+      clearTimeout(debounceTimeoutId);
+      setDebounceTimeoutId(null);
+    }
+    setDebounceTimeoutId(setTimeout(() => refreshPage(), timeout));
+  };
 
   return (
     <div className="with-sidebar">
@@ -307,7 +316,7 @@ export const CardGrid = ({
                   <NumberInput
                     onChange={(value) => {
                       setEnteredMinPrice(value);
-                      trySetPrice(value, enteredMaxPrice);
+                      debounceCall(() => trySetPrice(value, enteredMaxPrice), 500);
                     }}
                     value={enteredMinPrice ?? null}
                   >
@@ -324,7 +333,7 @@ export const CardGrid = ({
                   <NumberInput
                     onChange={(value) => {
                       setEnteredMaxPrice(value);
-                      trySetPrice(enteredMinPrice, value);
+                      debounceCall(() => trySetPrice(enteredMinPrice, value), 500);
                     }}
                     value={enteredMaxPrice ?? null}
                   >
